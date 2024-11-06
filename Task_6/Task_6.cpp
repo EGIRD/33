@@ -1,6 +1,10 @@
 #include <iostream>
 #include <limits>
 
+const long double PI = 3.14159265358979323846264338327950;
+const long double TwoPI = 6.28318530717958647692L; 
+const long double E = 2.71828;
+
 long double Abs(long double x) {
     if (x < 0) 
         x *= -1;
@@ -25,28 +29,21 @@ long double Factorial(long double n) {
         return n * Factorial(n - 1); 
 }
 
-long double MyFmod(long double x) {
-    const long double two_pi = 6.28318530717958647692L; 
-    long double y = two_pi;
-    int n = 0;
-    while (x > y) {
-        y = Pow(2, n) * two_pi;
-        n++;
+long double Normalize(long double x){
+    long double del = TwoPI;
+    while (del < Abs(x)) {del *= 2;};
+    while (Abs(x) > TwoPI) {
+        while (del > Abs(x) && Abs(x - del) > 0.1 && del > TwoPI) del /= 2;
+        x =(x > 0)? x - del : x + del;
     }
-    long double powtwo = Pow(2, n - 2) * two_pi;
-    long double endx = x - powtwo;
-    if (endx > two_pi) {
-        endx = MyFmod(endx);
-    }
-    return endx;
+    return x;
 }
-
 long double MySin(long double x) {
-    x = MyFmod(x);
-    const double PI = 3.141592;
+    x = Normalize(x);
     const long double pr = 1e-12;
     long double seqm = x;
     int n = 1;
+
     long double sum = seqm;
     while (Abs(seqm) > pr) {
         seqm = Pow(-1, n) * Pow(x, 2 * n + 1) / Factorial(2 * n + 1);
@@ -57,9 +54,8 @@ long double MySin(long double x) {
 }
 
 long double MyCos(long double x) {
-    x = MyFmod(x);
-    const double PI = 3.141592;
-    const long double pr = 1e-12;
+    x = Normalize(x);
+    const long double pr = 1e-10;
     long double seqm = 1; 
     int n = 1;
     long double sum = seqm; 
@@ -69,29 +65,27 @@ long double MyCos(long double x) {
         sum += seqm;
         n++;
     }
-    
     return sum;
 }
 
-long double MyLn(long double x) {   
-    double result = 0, result2 = 0, term, ln2 = 0.69314, xInit = x;
-    long long quant2;
+long double MyLn(double x){
 
-    while(x > 2)  {
-        x = x / 2;
-        quant2++;
+    long long n = 1, c = 0;
+    while(x > 1){
+        x = x / E;
+        c++;
     }
-
-    for(int n = 1; n < 1000; n++) {
-        term = Pow(-1, n + 1) * Pow(x - 1, n) / n;
-        result += term;
+    while(x < 1e-5){
+        x = x * E;
+        c--;
     }
-
-    if(xInit <= 2) return result;
-    else  {
-        result2 = result + quant2 * ln2;
-        return result2;
+    double res = 0 , ter = x - 1;
+    while(Abs(ter) > 1e-8){
+        res += ter;
+        ter *= -(x - 1) * n / (n + 1);
+        n++;
     }
+    return res + (double)c;
 }
 
 int main() {
@@ -100,17 +94,15 @@ int main() {
     std::cout << "Выполнил Радюк Егор. 453505. Вариант: 15." << '\n';
 
     long long k, n, size;
-    long double hhh, sinx, cosx, logx;
-    const double e = 2.7182818;
-    const double PI = 3.141592;
+    long double h, sinx, cosx, logx;
 
     while (true) {
         std::cout << "Введите 1 - если хотите продолжить, 2 - если хотите прекратить." << '\n';
         std::cin >> k;
         switch(k) {
         case (1): 
-            std::cout << "Введите значение х:";
-            std::cin >> hhh;
+            std::cout << "Введите значение переменной х:";
+            std::cin >> h;
             if (std::cin.fail()) {
                 std::cout << "Ошибка ввода." << '\n';
                 std::cin.clear();
@@ -118,16 +110,16 @@ int main() {
                 continue;
             }
           
-            if (hhh < 0) {
-                hhh = -hhh;
-                std::cout << "sin:" << -MySin(hhh) << "\n"; //<< sinx << "\n";
-                std::cout << "cos:" << -MyCos(hhh) << "\n"; //<< cosx << "\n";
-                std::cout << "ln:" << MyLn(hhh) << "\n"; //<< logx << "\n";
+            if (h < 0) {
+                h = -h;
+                std::cout << "sin:" << -MySin(h) << '\n'; 
+                std::cout << "cos:" << -MyCos(h)  << '\n';
+                std::cout << "ln:" << MyLn(h) << '\n'; 
             }
             else {
-            std::cout << "sin:" << MySin(hhh) << "\n"; //<< sinx << "\n";
-            std::cout << "cos:" << MyCos(hhh) << "\n"; //<< cosx << "\n";
-            std::cout << "ln:" << MyLn(hhh) <<  "\n"; //<< logx << "\n";
+            std::cout << "sin:" << MySin(h)  << '\n'; 
+            std::cout << "cos:" << MyCos(h)  << '\n'; 
+            std::cout << "ln:" << MyLn(h)  << '\n'; 
             }
             break;
 
@@ -142,4 +134,3 @@ int main() {
         }
     }
 }
-

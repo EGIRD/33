@@ -22,7 +22,7 @@ int main(){
         n++;
     } while(d >= exp);
     
-    std::cout << std::fixed << std::setprecision(6) << "sum = " << sum << '\n';
+    std::cout << std::fixed << std::setprecision(6) << "Cумма ряда = " << sum << '\n';
     
     return 0;
 }
